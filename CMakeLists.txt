@@ -21,3 +21,7 @@ set_target_properties(rmb_test PROPERTIES
     COMPILE_FLAGS "-march=native -Wignored-attributes"
 )
 
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(rmb_test PUBLIC OpenMP::OpenMP_CXX)
+endif()

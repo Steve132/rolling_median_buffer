@@ -26,11 +26,11 @@ protected:
 	std::vector<simd_reg,typename simd_traits<T>::allocator> entries;
 	
 	size_t head;
-	size_t npoints;
 public:
 	using vector_type=std::vector<T,simd_allocator<T,simd_align>>;
 	
-	rolling_median_buffer(size_t n):entries(N*((n/simd_lane_count)+(n % simd_lane_count ? 1 : 0))),head(0)
+	//N*((n/simd_lane_count)+(n % simd_lane_count ? 1 : 0))
+	rolling_median_buffer(size_t n):entries((n*N)/simd_lane_count+((n % simd_lane_count) ? N : 0)),head(0)
 	{}
 	void poppush(const T* bufin,T* bufout,size_t offset,size_t count)
 	{
@@ -48,7 +48,7 @@ public:
 
 		for(size_t i=boffset;i<bcount;i++)
 		{
-			simd_reg* buckets_start=entries_ptr+i*(N*simd_lane_count);
+			simd_reg* buckets_start=entries_ptr+i*N;
 			buckets_start[head]=bufin_simd[i];
  			std::array<simd_reg,N> cpy=*reinterpret_cast<const std::array<simd_reg,N>*>(buckets_start);
 			bufout_simd[i]=simd_med<T,simd_reg,N>::median(cpy);
@@ -58,7 +58,7 @@ public:
 	{
 		head=(head+1) % N;
 	}
-	size_t size() const { return npoints; }
+	//size_t size() const { return npoints; }
 };
 
 //https://en.wikipedia.org/wiki/Batcher_odd%E2%80%93even_mergesort
