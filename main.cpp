@@ -9,7 +9,7 @@ int main()
 	rolling_median_buffer<uint8_t,8>::vector_type buf(nelems);
 	rolling_median_buffer<uint8_t,8> rmb(nelems);
 	
-	
+	std::cout << "Begin" << std::endl;
 	
 	#pragma omp parallel
 	for(unsigned int i=0;i<10;i++)
@@ -31,6 +31,7 @@ int main()
 		//std::cout << std::endl << (int)buf[0] << std::endl;
 	}
 	
+	std::cout << "End" << std::endl;
 	
 	
 	
