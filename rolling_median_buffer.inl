@@ -4,7 +4,7 @@ namespace
 template<class T,class simd_reg>
 void cswap(simd_reg& a,simd_reg& b);
 
-#ifdef __AVX2__
+#if defined(__AVX2__)
 #include <immintrin.h>
 
 template<>
@@ -33,14 +33,23 @@ inline void cswap<int32_t,__m256i>(__m256i& a,__m256i& b) {
 }
 
 
-#endif
-
-#ifdef __ARM_NEON
+#elif defined(__ARM_NEON)
 template<>
 inline void cswap<uint8_t,int8x16_t>(int8x16_t& a,int8x16_t& b) {
 	int8x16_t tmp=b;b=vmaxq_u8(a,b);a=vminq_u8(a,tmp);
 }
+#else
+template<>
+inline void cswap<uint8_t,std::array<uint8_t,1> >(std::array<uint8_t,1>& a,std::array<uint8_t,1>& b) {
+	uint8_t* aptr=reinterpret_cast<uint8_t*>(&a);
+	uint8_t* bptr=reinterpret_cast<uint8_t*>(&b);
+	for(unsigned int i=0;i<sizeof(std::array<uint8_t,1>);i++)
+	{
+		if(*aptr < *bptr) { std::swap(*aptr,*bptr); }
+	}
+}
 #endif
+
 
 
 }

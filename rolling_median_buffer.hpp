@@ -34,11 +34,11 @@ public:
 	{}
 	void poppush(const T* bufin,T* bufout,size_t offset,size_t count)
 	{
-		if(((reinterpret_cast<std::intptr_t>(bufin)%simd_align)!=0) 
+		/*if(((reinterpret_cast<std::intptr_t>(bufin)%simd_align)!=0) 
 		||((reinterpret_cast<std::intptr_t>(bufout)%simd_align)!=0))
 		{
 			throw std::runtime_error("IO buffers not aligned");
-		}
+		}*/
 		simd_reg* entries_ptr=entries.data();
 		const simd_reg* bufin_simd=reinterpret_cast<const simd_reg*>(bufin);
 		simd_reg* bufout_simd=reinterpret_cast<simd_reg*>(bufout);
@@ -49,9 +49,9 @@ public:
 		for(size_t i=boffset;i<bcount;i++)
 		{
 			simd_reg* buckets_start=entries_ptr+i*N;
-			buckets_start[head]=bufin_simd[i];
+			buckets_start[head]=simd_traits<T>::load_u(bufin_simd+i);
  			std::array<simd_reg,N> cpy=*reinterpret_cast<const std::array<simd_reg,N>*>(buckets_start);
-			bufout_simd[i]=simd_med<T,simd_reg,N>::median(cpy);
+			simd_traits<T>::store_u(bufout_simd+i,simd_med<T,simd_reg,N>::median(cpy));
 		}
 	}
 	void push_complete()

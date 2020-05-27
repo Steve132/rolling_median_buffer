@@ -27,6 +27,12 @@ struct simd_traits
 	using register_type=std::array<T,lane_count>;
 	static constexpr unsigned int alignment=alignof(register_type);
 	using allocator=simd_allocator<register_type,alignment>;
+	static register_type load_u(const register_type* raddr) {
+		return *raddr;
+	}
+	static void store_u(register_type* raddr,const register_type& r){
+		*raddr=r;
+	}
 };
 
 
@@ -58,11 +64,21 @@ struct simd_traits<uint8_t,0>
 	using register_type=__m256i;
 	static constexpr unsigned int alignment=alignof(register_type);
 	using allocator=simd_allocator<register_type,alignment>;
+	
+	static register_type load_u(const register_type* raddr) {
+		return _mm256_loadu_si256(raddr);
+	}
+	static void store_u(register_type* raddr,const register_type& r){
+		_mm256_storeu_si256(raddr,r);
+	}
 };
 
 #endif
 
 #ifdef __ARM_NEON
+
+#include<arm_neon.h>
+
 template<>
 struct simd_traits<uint8_t,0>
 {
@@ -70,6 +86,12 @@ struct simd_traits<uint8_t,0>
 	using register_type=int8x16_t;
 	static constexpr unsigned int alignment=alignof(register_type);
 	using allocator=simd_allocator<register_type,alignment>;
+	static register_type load_u(const register_type* raddr) {
+		return *raddr;
+	}
+	static void store_u(register_type* raddr,const register_type& r){
+		*raddr=r;
+	}
 };
 #endif
 
