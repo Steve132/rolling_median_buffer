@@ -45,7 +45,8 @@ public:
 		
 		size_t boffset=offset/simd_lane_count;
 		size_t bcount=count/simd_lane_count;
-
+		
+		#pragma omp for
 		for(size_t i=boffset;i<bcount;i++)
 		{
 			simd_reg* buckets_start=entries_ptr+i*N;
